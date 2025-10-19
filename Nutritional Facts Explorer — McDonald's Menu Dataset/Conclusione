@@ -1,0 +1,10 @@
+## ✅ Conclusione
+
+Abbiamo esplorato il dataset nutrizionale del menu McDonald's, visualizzato le distribuzioni e correlazioni, trattato gli outlier e costruito un semplice modello di regressione per stimare le calorie in base a proteine e carboidrati.
+
+🔍 Prossimi passi:
+- Aggiungere più feature al modello
+- Provare modelli non lineari
+- Analizzare categorie di prodotto
+
+📁 Questo notebook è pronto per essere pubblicato su GitHub o Kaggle come starter didattico.
