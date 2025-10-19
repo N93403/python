@@ -1,0 +1,7 @@
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Calories")
+plt.ylabel("Predicted Calories")
+plt.title("🎯 Actual vs Predicted Calories")
+plt.plot([y.min(), y.max()], [y.min(), y.max()], color='red')
+plt.tight_layout()
+plt.show()
