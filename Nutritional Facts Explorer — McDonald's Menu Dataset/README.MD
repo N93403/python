@@ -14,4 +14,13 @@ Questo progetto esplora il dataset nutrizionale del menu McDonald's, disponibile
 
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn
-python src/analyze_menu.py
+
+##📊 Dataset
+Fonte: Kaggle - Nutrition Facts for McDonald's Menu
+
+File: menu.csv
+
+Variabili: calorie, grassi, carboidrati, proteine, zuccheri, sodio, ecc.
+
+##📚 Notebook
+Il notebook menu_analysis.ipynb mostra passo-passo l’analisi e la modellazione.
