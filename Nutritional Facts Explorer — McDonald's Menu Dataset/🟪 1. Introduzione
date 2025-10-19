@@ -1,7 +1,0 @@
-# 🍔 Nutritional Facts Analysis — McDonald's Menu
-
-Questo notebook esplora il dataset nutrizionale del menu McDonald's. L'obiettivo è analizzare le caratteristiche nutrizionali, visualizzare le distribuzioni, identificare correlazioni e costruire un semplice modello predittivo.
-
-📌 Dataset: [menu.csv](https://www.kaggle.com/datasets/mcdonalds/nutrition-facts)
-
-📊 Variabili: calorie, grassi, carboidrati, proteine, zuccheri, sodio, ecc.
