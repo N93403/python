@@ -12,8 +12,7 @@ Questo progetto partecipa alla challenge AI Planet per prevedere se un cliente r
 
 ## 🚀 Avvio rapido
 
-```bash
-git clone https://github.com/<tuo-username>/insurance-claim-prediction.git
+
 cd insurance-claim-prediction
 bash setup.sh
 
