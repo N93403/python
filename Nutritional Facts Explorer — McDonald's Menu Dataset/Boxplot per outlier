@@ -1,0 +1,5 @@
+for col in numeric_df.columns:
+    plt.figure()
+    sns.boxplot(x=numeric_df[col])
+    plt.title(f"📦 Boxplot: {col}")
+    plt.show()
