@@ -1,0 +1,19 @@
+
+---
+
+## 🧪 requirements.txt
+
+```txt
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+xgboost
+lightgbm
+shap
+
+📊 Risultati
+F1-score Logistic Regression: 
+
+F1-score Ensemble: 
