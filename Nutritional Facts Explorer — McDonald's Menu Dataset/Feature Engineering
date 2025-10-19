@@ -1,0 +1,3 @@
+# Normalizzazione delle calorie
+df['normalized_calories'] = (df['Calories'] - df['Calories'].min()) / (df['Calories'].max() - df['Calories'].min())
+df[['Calories', 'normalized_calories']].head()
