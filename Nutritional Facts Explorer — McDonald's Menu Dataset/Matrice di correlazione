@@ -1,0 +1,10 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+numeric_df = df.select_dtypes(include=[np.number]).dropna()
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm")
+plt.title("🔗 Correlation Matrix")
+plt.tight_layout()
+plt.show()
