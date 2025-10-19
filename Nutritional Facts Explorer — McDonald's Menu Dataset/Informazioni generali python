@@ -1,0 +1,5 @@
+# Informazioni sulle colonne
+df.info()
+
+# Statistiche descrittive
+df.describe()
