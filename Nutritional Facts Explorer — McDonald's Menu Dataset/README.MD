@@ -14,4 +14,4 @@ Questo progetto esplora il dataset nutrizionale del menu McDonald's, disponibile
 
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn
-python src/analyze_menu.py
+
