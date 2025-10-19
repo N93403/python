@@ -1,0 +1,412 @@
+https://aiplanet.com/learn/machine-learning-bootcamp/module-4-hyperparameter-tuning-and-feature-selection/853/assignment-3
+
+https://aiplanet.com/notebooks/725/vinrock19/insurance-claim-prediction
+
+https://aiplanet.com/challenges/49/travel-insurance-claim-prediction-49/overview/about
+# Step 1: Load the data
+import pandas as pd
+
+# Load training and test data
+insurance_data = pd.read_csv("https://raw.githubusercontent.com/dphi-official/Datasets/master/travel_insurance/Training_set_label.csv")
+test_data = pd.read_csv('https://raw.githubusercontent.com/dphi-official/Datasets/master/travel_insurance/Testing_set_label.csv')
+
+# Step 2: Data Preprocessing
+
+# Handle categorical variables (you can use One-Hot Encoding or Label Encoding)
+insurance_data = pd.get_dummies(insurance_data, drop_first=True)
+test_data = pd.get_dummies(test_data, drop_first=True)
+
+# Ensure both training and test data have the same columns after encoding
+test_data = test_data.reindex(columns=insurance_data.columns, fill_value=0)
+
+# Step 3: Split the data (train-validation split)
+from sklearn.model_selection import train_test_split
+
+X = insurance_data.drop(columns=['Claim'])  # Features
+y = insurance_data['Claim']  # Target variable
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 4: Model Training (e.g., using RandomForestClassifier)
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+# Step 5: Model Evaluation (on validation data)
+y_val_pred = model.predict(X_val)
+print(f"Validation Accuracy: {accuracy_score(y_val, y_val_pred)}")
+
+# Step 6: Make Predictions on the Test Data
+test_predictions = model.predict(test_data)
+
+# Step 7: Prepare the Submission File
+submission = pd.DataFrame({'prediction': test_predictions})
+
+# Save the predictions in the required format
+submission.to_csv('predictions.csv', index=False)
+
+# Install required packages
+!pip install scikit-learn==0.23.1                   #  provides a range of supervised and unsupervised learning algorithms
+!pip install -U git+https://github.com/scikit-learn-contrib/imbalanced-learn.git                      # to deal with imbalanced dataset
+!pip install pywedge
+# !pip install voila-gridstack
+# !pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master
+# !jupyter contrib nbextension install --user
+# Import required packages
+import numpy as np        # Fundamental package for linear algebra and multidimensional arrays
+import pandas as pd       # Data analysis and manipultion tool
+pd.set_option('display.max_rows', 500)
+import pywedge as pw      # library to perform EDA, make charts
+import six
+### Travel Insurance - It is a type of insurance that covers the costs and losses associated with traveling. It is useful protection for those traveling domestically or abroad.
+1. <em><u>Problem Statement</u></em> - **Predict if an insurance buyer will claim the insurance or not**
+2. <em><u>What kind of problem is it?</u></em> - A classification (Supervised learning) problem as we have to predict **Y/N** regarding claims.
+
+
+# Get to know the data
+
+---
+
+> There are 11 columns in the dataset.
+
+**Predictors / Independent / Inputs variables (or) features:**
+
+- Duration: Travel duration
+- Destination: Travel destination
+- Agency: Agency Name
+- Commission: Commission on the insurance
+- Age: Age of the insurance buyer
+- Gender: Gender of the insurance buyer
+- Agency Type: What is the agency type?
+- Distribution Channel: offline/online
+- Product Name: Name of the insurance plan
+- Net Sales: Net sales
+
+**Target / Dependent / Output variable (or) feature:**
+
+- Claim: claimed or not
+# Read the data
+insurance_data = pd.read_csv("https://github.com/dphi-official/Datasets/blob/master/travel_insurance/Training_set_label.csv?raw=true")
+# Performing EDA
+rows, cols = insurance_data.shape
+print(f'There are {rows} records and {cols} features')
+insurance_data.sample(10)
+insurance_data.info()
+So, as we can see from here, we have **6 object** type features, **3 integer** and **2 float** with **Gender** feature having missing values.
+insurance_data.isnull().sum()
+**Gender** feature has **34361** missing values i.e. ~**71%**
+insurance_data.describe().T
+# filling missing values in Gender feature as  'Not Specified'
+insurance_data['Gender'].fillna('Not Specified', inplace=True)
+insurance_data.isnull().sum()
+## Have a look at target
+# Imbalanced data as non-claim is dominant over claim class
+insurance_data['Claim'].value_counts()
+insurance_data.sample(10)
+## Checking the distribution
+# Using pywedge make_charts
+
+!pip install pywedge==0.5.1.8
+self.X = self.train.drop(self.y, axis=1)
+
+import pandas as pd
+import pywedge as pw
+
+# Load the insurance data
+insurance_data = pd.read_csv("https://raw.githubusercontent.com/dphi-official/Datasets/master/travel_insurance/Training_set_label.csv")
+
+# Initialize Pywedge_Charts
+mc = pw.Pywedge_Charts(insurance_data, c=None, y='Claim')
+
+# Generate the charts
+mc.make_charts()
+# Using pywedge make_charts
+mc = pw.Pywedge_Charts(insurance_data, c=None, y = 'Claim')
+charts = mc.make_charts()
+df_claim = insurance_data[insurance_data['Claim'] == 1]
+df_claim['Gender'].value_counts()
+# Drop these columns
+def drop_cols_df(data):
+  drop_cols = ['Distribution Channel', 'Destination', 'Agency Type']
+
+  dropped_df = data.copy()
+  dropped_df.drop(drop_cols, axis=1, inplace=True)
+
+  return dropped_df
+#  One hot encoding for 'Agency', 'Gender', 'Product Name'
+from sklearn.preprocessing import OneHotEncoder
+
+cat_cols = ['Agency', 'Gender', 'Product Name']
+# dropped_df = pd.get_dummies(dropped_df, columns=cat_cols)
+
+dropped_df = drop_cols_df(insurance_data)
+print('dropped_df.shape:- ', dropped_df.shape)
+
+cat_df = dropped_df[cat_cols]
+
+# instantiate OHE
+ohe = OneHotEncoder(handle_unknown = 'ignore')
+
+# fit
+ohe.fit(cat_df)
+
+# fit & transform
+transformed = ohe.fit_transform(cat_df).toarray()
+
+new_df = pd.DataFrame()
+ohe_df = pd.DataFrame(transformed, columns=ohe.get_feature_names())
+print('ohe_df:- ', ohe_df.shape)
+new_df = pd.concat([dropped_df, ohe_df], axis=1).drop(cat_cols, axis=1)
+print('new_df:- ', new_df.shape)
+new_df.columns
+# Dependent and Independent features
+X = new_df.drop(['Claim'], axis=1)
+y = new_df['Claim']
+# Splitting the data
+from sklearn.model_selection import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3, random_state = 101)
+print(X_train.shape, X_test.shape, Y_train.shape, Y_test.shape)
+# Imbalanced Target has to be balanced by using SMOTE technique
+import six
+import imblearn
+from imblearn.over_sampling import SMOTE
+
+sm = SMOTE(random_state = 25, sampling_strategy = 1.0)   # here trying to eqalize both the classes
+# fit the sampling
+X_train, Y_train = sm.fit_sample(X_train, Y_train)
+Y_train.value_counts()
+Y_test.value_counts()
+# Plot Confusion Matrix
+
+def plot_confusion_matrix(cm,
+                          target_names,
+                          title='Confusion matrix',
+                          cmap=None,
+                          normalize=True):
+    """
+    given a sklearn confusion matrix (cm), make a nice plot
+
+    Arguments
+    ---------
+    cm:           confusion matrix from sklearn.metrics.confusion_matrix
+
+    target_names: given classification classes such as [0, 1, 2]
+                  the class names, for example: ['high', 'medium', 'low']
+
+    title:        the text to display at the top of the matrix
+
+    cmap:         the gradient of the values displayed from matplotlib.pyplot.cm
+                  see http://matplotlib.org/examples/color/colormaps_reference.html
+                  plt.get_cmap('jet') or plt.cm.Blues
+
+    normalize:    If False, plot the raw numbers
+                  If True, plot the proportions
+
+    Usage
+    -----
+    plot_confusion_matrix(cm           = cm,                  # confusion matrix created by
+                                                              # sklearn.metrics.confusion_matrix
+                          normalize    = True,                # show proportions
+                          target_names = y_labels_vals,       # list of names of the classes
+                          title        = best_estimator_name) # title of graph
+
+    Citiation
+    ---------
+    http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import itertools
+
+    accuracy = np.trace(cm) / np.sum(cm).astype('float')
+    misclass = 1 - accuracy
+
+    if cmap is None:
+        cmap = plt.get_cmap('Blues')
+
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+
+    if target_names is not None:
+        tick_marks = np.arange(len(target_names))
+        plt.xticks(tick_marks, target_names, rotation=45)
+        plt.yticks(tick_marks, target_names)
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+
+    thresh = cm.max() / 1.5 if normalize else cm.max() / 2
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        if normalize:
+            plt.text(j, i, "{:0.4f}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+        else:
+            plt.text(j, i, "{:,}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+    plt.show()
+# Building a classification model
+## Logistic Regression
+# import Logistic Regression from sklearn.linear_model
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, classification_report, f1_score, accuracy_score
+lr_model = LogisticRegression(max_iter=10000)
+# Fit the model
+lr_model.fit(X_train, Y_train)
+predictions = lr_model.predict(X_test)
+labels = Y_test.value_counts().index.tolist()
+cm = confusion_matrix(Y_test, predictions)
+plot_confusion_matrix(cm, labels)
+print (f'Accuracy - : {lr_model.score(X_test,Y_test):.3f}')
+
+print ("F1 Score: {}".format(f1_score(Y_test, predictions)))
+Y_test.value_counts()
+report= classification_report(Y_test, predictions, labels=labels)
+print(report)
+## Decision Tree
+from sklearn.tree import DecisionTreeClassifier
+
+# create the model object
+dt = DecisionTreeClassifier(random_state=1) # max-depth controls the maximum depth of the tree
+
+# fit the model on train data
+dt.fit(X_train, Y_train)
+dt_predictions = dt.predict(X_test)
+
+print (f'Accuracy - : {dt.score(X_test,Y_test):.3f}')
+print ("F1 Score: {}".format(f1_score(Y_test, dt_predictions)))
+cm = confusion_matrix(Y_test, dt_predictions)
+plot_confusion_matrix(cm, labels)
+## RandomForest Classifier
+from sklearn.ensemble import RandomForestClassifier
+rfc = RandomForestClassifier()
+
+# fit the data
+rfc.fit(X_train, Y_train)
+rfc_predictions = rfc.predict(X_test)
+
+print (f'Accuracy - : {rfc.score(X_test,Y_test):.3f}')
+print ("F1 Score: {}".format(f1_score(Y_test, rfc_predictions)))
+cm = confusion_matrix(Y_test, rfc_predictions)
+plot_confusion_matrix(cm, labels)
+# Grid Search
+from sklearn.model_selection import GridSearchCV
+## Random Forest CV
+grid_search_1 = {
+    'bootstrap': [True],
+'max_depth': [10, 20],
+'min_samples_leaf': [3, 4],
+'min_samples_split': [4, 6],
+'n_estimators': [100, 200],
+}
+rfc_clf_cv = GridSearchCV(rfc, param_grid = grid_search_1, cv = 3, verbose=2, n_jobs=-1)
+rfc_clf_cv.fit(X_train,Y_train)
+rfc_clf_cv.best_estimator_
+rfc_cv_predictions = rfc_clf_cv.predict(X_test)
+
+print (f'Accuracy - : {rfc_clf_cv.score(X_test,Y_test):.3f}')
+print (f'F1 Score - : {f1_score(Y_test, rfc_cv_predictions):.3f}')
+
+## Decision Tree CV
+grid_search_2 = {
+    'max_leaf_nodes': [5, 10, 15, 20],
+'min_samples_split': [4, 6, 8, 10]
+}
+dt_clf_cv = GridSearchCV(dt, param_grid = grid_search_2, cv = 3, verbose=2, n_jobs=-1)
+dt_clf_cv.fit(X_train,Y_train)
+dt_clf_cv.best_estimator_
+dt_cv_predictions = dt_clf_cv.predict(X_test)
+
+print (f'Accuracy - : {dt_clf_cv.score(X_test,Y_test):.3f}')
+print ("F1 Score: {}".format(f1_score(Y_test, dt_cv_predictions)))
+
+# Feature Selection using RFE
+from sklearn.feature_selection import RFE
+
+estimator = RandomForestClassifier(random_state=1)
+rfe = RFE(estimator, step=1)
+
+# fit the data to rfe
+rfe.fit(X_train, Y_train)
+rfe.n_features_
+# summarize all features
+for i, col in enumerate(X.columns.tolist()):
+	print('Column: %s, Selected %s, Rank: %.3f' % (col, rfe.support_[i], rfe.ranking_[i]))
+df_features = pd.DataFrame({'columns' : X.columns.tolist(),
+                               'support' : rfe.support_.tolist(),
+                               'ranking' : rfe.ranking_.tolist()})
+rfe_cols = df_features[df_features['support'] == True]['columns'].tolist()
+df_features[df_features['support'] == True]
+# Train the new classifier on the new dataset containing the most important features
+rfc_new = RandomForestClassifier(random_state=1)
+
+# Transforming the data
+X_train_rfe = rfe.transform(X_train)
+X_test_rfe = rfe.transform(X_test)
+
+# fit the data
+rfc_new.fit(X_train_rfe, Y_train)
+X_train_rfe.shape
+# rfe_preds = rfc_new.predict(X_test_rfe)
+
+print (f'Accuracy - : {rfc_new.score(X_test_rfe,Y_test):.3f}')
+print ("F1 Score: {}".format(f1_score(Y_test, rfc_new.predict(X_test_rfe))))
+rfc_grid_search = GridSearchCV(rfc, param_grid = grid_search_1, cv = 3, verbose=2, n_jobs=-1)
+rfc_grid_search.fit(X_train_rfe, Y_train)
+print (f'Accuracy - : {accuracy_score(Y_test, rfc_grid_search.predict(X_test_rfe)):.3f}')
+print (f'F1 Score - : {f1_score(Y_test,rfc_grid_search.predict(X_test_rfe)):.3f}')
+models = {'Logistic Regression': lr_model, 'Random Forest Classifier': rfc, 'Decision Tree': dt,
+          'Hyperparameter Tunning | Random Forest': rfc_clf_cv, 'Hyperparameter Tunning | DT': dt_clf_cv, 'Hyperparameter Tuninng | Random Forest | RFE': rfc_grid_search}
+
+test_data = [X_test, X_test, X_test, X_test, X_test, X_test_rfe]
+model_performance = []
+
+i=0
+for key, value in models.items():
+  model_performance.append([key, accuracy_score(Y_test, value.predict(test_data[i])), f1_score(Y_test, value.predict(test_data[i]))])
+  i += 1
+
+
+df = pd.DataFrame(model_performance, columns=['Using Model', 'Accuracy', 'f1 score'])
+df.sort_values(by='f1 score', ascending=False)
+# Test Dataset
+test_df = pd.read_csv('/content/drive/MyDrive/Data Science/DS Dphi Bootcamp/machineLearning/Datathon Notebooks/Assignment 1/testing_set_label.csv')
+test_df.shape
+print(test_df.select_dtypes('object').nunique())
+print("\n")
+print(insurance_data.select_dtypes('object').nunique())
+test_df.isnull().sum()
+# filling missing values in Gender feature as  'Not Specified'
+test_df['Gender'].fillna('Not Specified', inplace=True)
+cat_cols = ['Agency', 'Gender', 'Product Name']
+# dropped_df = pd.get_dummies(dropped_df, columns=cat_cols)
+
+dropped_df = drop_cols_df(test_df)
+print('dropped_df.shape:- ', dropped_df.shape)
+
+cat_df = dropped_df[cat_cols]
+
+# fit & transform
+transformed = ohe.transform(cat_df).toarray()
+
+new_test_df = pd.DataFrame()
+ohe_test_df = pd.DataFrame(transformed, columns=ohe.get_feature_names())
+print('ohe_df:- ', ohe_df.shape)
+new_test_df = pd.concat([dropped_df, ohe_test_df], axis=1).drop(cat_cols, axis=1)
+print('new_test_df:- ', new_test_df.shape)
+predictions = dt_clf_cv.predict(new_test_df)
+prediction_df = pd.DataFrame({"prediction": predictions})
+prediction_df.head(100)
+prediction_df.to_csv("Predictions_Assignment1.csv", index=0)
