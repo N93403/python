@@ -1,0 +1,4 @@
+pd.plotting.scatter_matrix(numeric_df, figsize=(12, 12), diagonal='kde')
+plt.suptitle("📊 Scatter Matrix")
+plt.tight_layout()
+plt.show()
